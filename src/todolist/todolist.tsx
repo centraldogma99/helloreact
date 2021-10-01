@@ -1,91 +1,49 @@
 import React from "react";
-
-interface TodoProps {
-  content: string
-}
-
-class Todo extends React.Component<TodoProps> {
-  render() {
-    return (
-      <tr>
-        <td>{this.props.content ?? ""}</td>
-      </tr>
-    );
-  }
-}
-
-interface AddFormProps {
-  onClick: (content: string) => any
-}
-interface AddFormStates {
-  text: string
-}
-class AddForm extends React.Component<AddFormProps, AddFormStates> {
-  state = {
-    text: ""
-  }
-
-  handleChange = (e: any) => {
-    const target = e.target as HTMLInputElement;
-    this.setState({
-      text: target.value
-    })
-  }
-
-  handleClick = () => {
-    this.props.onClick(this.state.text);
-    (document.getElementById("whatToAdd") as HTMLInputElement).value = "";
-  }
-
-  render() {
-    return (
-      <div id="addForm">
-        <input type="text" name="whatToAdd" id="whatToAdd" onChange={this.handleChange} />
-        <input type="button" name="addBtn" onClick={this.handleClick} />\
-      </div>
-    )
-  }
-}
-
-// interface TodoListProps {
-// }
+import { AddForm } from "./AddForm"
+import { Todo } from "./Todo"
 
 interface TodoListStates {
-  todos: string[]
+  todos: {
+    index: number,
+    text: string
+  }[]
 }
-export class TodoList extends React.Component<Record<string, never>, TodoListStates> {
+export class TodoList extends React.Component<Record<string, never>, TodoListStates> {  //TODO what Record<string, never> means?
   state = {
     todos: [
-      "hi", "ho"
+      { index: 0, text: "just a random todo" }, { index: 1, text: "play LOL" }
     ]
   }
 
   renderTodos() {
     let i = 0;
     return this.state.todos.map(todo => {
-      return <Todo key={++i} content={i + ". " + todo} />
+      i++;
+      return <Todo key={i} content={i + ". " + todo.text} onDeleteClick={() => this.handleDeleteClick(todo.index)} />
     })
   }
 
-  // handleClick(content: string) {
-  //   this.setState({
-  //     todos: this.state.todos.concat(content)
-  //   })
-  // }
-
   handleClick = (content: string) => {
+    const todos = this.state.todos;
     this.setState({
-      todos: [...this.state.todos, content]
+      todos: [...todos, { index: todos[todos.length - 1].index + 1, text: content }]
+    })
+  }
+
+  handleDeleteClick = (i: number) => {
+    const todos = this.state.todos.slice();
+    this.setState({
+      todos: todos.filter(todo => todo.index != i)
     })
   }
 
   render() {
     return (
       <div>
-        <h1>ToDoList 20210930</h1>
+        <h1>ToDoList v{new Date().toLocaleDateString('ko-KR')}</h1>
         <table>
           <tr>
-            <td>ToDos</td>
+            <td><h2>ToDos</h2></td>
           </tr>
           {this.renderTodos()}
         </table>
