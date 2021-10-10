@@ -19,6 +19,7 @@ export function Chatting(props: { roomId: number }) {
     }));
   const [loadIdx, setLoadIdx] = useState<number>(-1);
   const [targetChats, setTargetChats] = useState<chat[]>(chats.slice(0, 40));
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   const numOfAScroll = 20;
 
@@ -27,6 +28,7 @@ export function Chatting(props: { roomId: number }) {
     targetChats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
 
   const fetchChats = () => {
+    if (targetChats.length >= 200) setHasMore(false);
     const t = Array.from({ length: numOfAScroll }).map((_, index) => {
       const i = index + targetChats.length
       return {
@@ -64,8 +66,9 @@ export function Chatting(props: { roomId: number }) {
       <InfiniteScroll
         dataLength={targetChats.length}
         next={fetchChats}
-        hasMore={true}
+        hasMore={hasMore}
         loader={<h4>loading...</h4>}
+        height={400}
       >
         <p>{props.roomId}번 채팅방입니다.</p>
         <table>
@@ -76,6 +79,6 @@ export function Chatting(props: { roomId: number }) {
         </table>
         <InputForm socket={socket} />
       </InfiniteScroll>
-    </div>
+    </div >
   )
 }
