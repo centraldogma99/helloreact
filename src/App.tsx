@@ -11,6 +11,7 @@ function App() {
   // socket.emit('randomEvent', "hello");
   return (
     <div className="App">
+      <h1>채팅채팅!!</h1>
       <EnterChat />
     </div>
   );
