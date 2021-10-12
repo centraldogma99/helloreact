@@ -3,12 +3,14 @@ import { io } from "socket.io-client";
 import { chat } from "./types/chat"
 import { InputForm } from "./InputForm";
 import { Chat } from "./Chat";
-import InfiniteScroll from 'react-infinite-scroll-component';
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 
 const serverAddress = "http://localhost:9000";
 
 export function Chatting(props: { roomId: number }) {
+  const scrollLength = 40;
   const [socket, setSocket] = useState<any>();
+
   const [chats, setChats] = useState<chat[]>(Array.from({ length: 100 }).map(
     (i, index) => {
       return {
@@ -17,27 +19,9 @@ export function Chatting(props: { roomId: number }) {
         time: new Date()
       }
     }));
-  const [loadIdx, setLoadIdx] = useState<number>(-1);
-  const [targetChats, setTargetChats] = useState<chat[]>(chats.slice(0, 40));
-  const [hasMore, setHasMore] = useState<boolean>(true);
-
-  const numOfAScroll = 20;
-
-
-  const renderChats = () =>
-    targetChats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
-
-  const fetchChats = () => {
-    if (targetChats.length >= 200) setHasMore(false);
-    const t = Array.from({ length: numOfAScroll }).map((_, index) => {
-      const i = index + targetChats.length
-      return {
-        author: "author" + i,
-        text: i.toString(),
-        time: new Date()
-      }
-    });
-    setTimeout(() => { setTargetChats(prev => [...prev, ...t]) }, 1000)
+  const { items, hasMore, loadItems } = useInfiniteScroll(chats, scrollLength);
+  const renderChats = (chats: chat[]) => {
+    return chats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
   }
 
   useEffect(() => {
@@ -48,7 +32,7 @@ export function Chatting(props: { roomId: number }) {
     });
 
     const handleChat = (chat: chat) => {
-      console.log(chat);
+      console.log(chat);  // TEST
       setChats(prev => [...prev, chat])
     }
 
@@ -63,22 +47,12 @@ export function Chatting(props: { roomId: number }) {
 
   return (
     <div>
-      <InfiniteScroll
-        dataLength={targetChats.length}
-        next={fetchChats}
-        hasMore={hasMore}
-        loader={<h4>loading...</h4>}
-        height={400}
-      >
-        <p>{props.roomId}번 채팅방입니다.</p>
-        <table>
-          {targetChats.map(
-            (chat, index) =>
-              <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />
-          )}
-        </table>
-        <InputForm socket={socket} />
-      </InfiniteScroll>
+      <p>{props.roomId}번 채팅방입니다.</p>
+      <table>
+        {renderChats(items)}
+        {hasMore && <button onClick={() => { loadItems() }}>Load more</button>}
+      </table>
+      <InputForm socket={socket} />
     </div >
   )
 }
