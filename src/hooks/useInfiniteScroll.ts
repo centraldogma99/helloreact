@@ -6,19 +6,22 @@ const useInfiniteScroll = (data: any[], scrollLength: number) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
 
   const { next, hasNext } = useInversePaginator(data, scrollLength);
-  const loadItems = () => {
+  const loadItems = async () => {
     const h = hasNext();
     if (h) {
       setHasMore(h);
-      setItems(prev => [...prev, ...next()]);
+      setTimeout(() => {
+        setItems(prev => [...prev, ...next()]);
+      }, 1000)
     }
+
     return;
   }
 
-  const handleScroll = () => {
-    if (window.innerHeight + window.scrollY < document.body.offsetHeight) return;
-    else loadItems();
-  }
+  // const handleScroll = () => {
+  //   if (window.innerHeight + window.scrollY < document.body.offsetHeight) return;
+  //   else loadItems();
+  // }
 
   useEffect(() => {
     loadItems();
