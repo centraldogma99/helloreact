@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { chat } from "./types/chat"
 import { InputForm } from "./InputForm";
@@ -9,10 +9,10 @@ const serverAddress = "http://localhost:9000";
 
 export function Chatting(props: { roomId: number }) {
   const scrollLength = 25;
+  const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
-  const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const [chats, setChats] = useState<chat[]>(Array.from({ length: 100 }).map(
+  const [chats, setChats] = useState<chat[]>(Array.from({ length: 199 }).map(
     (i, index) => {
       return {
         author: "author" + index,
@@ -20,33 +20,11 @@ export function Chatting(props: { roomId: number }) {
         time: new Date()
       }
     }));
-  const { items, hasMore, loadItems } = useInfiniteScroll(chats, scrollLength);
+
+  const { items } = useInfiniteScroll(chats, scrollLength, self.current);
   const renderChats = (chats: chat[]) => {
     return chats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
   }
-
-  const handleScroll = async () => {
-    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isFetching) return;
-    else {
-      console.log("fetching new...(setIsFetching set to true)")
-      setIsFetching(true);
-    }
-  }
-
-  useEffect(() => {
-    if (isFetching && hasMore) {
-      loadItems();
-      setIsFetching(false);
-      console.log("loadItem in useEffect...(setIsFetching set to false)")
-    } else {
-      return;
-    }
-  }, [isFetching])
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => { window.removeEventListener('scroll', handleScroll) };
-  }, [])
 
   useEffect(() => {
     const socket = io(serverAddress, {
@@ -70,11 +48,12 @@ export function Chatting(props: { roomId: number }) {
   }, [])
 
   return (
-    <div>
+    <div ref={self} id="chatting">
       <p>{props.roomId}번 채팅방입니다.</p>
       <table>
-        {renderChats(items)}
-        {/* {hasMore && <button onClick={() => { loadItems() }}>Load more</button>} */}
+        <tbody>
+          {renderChats(items)}
+        </tbody>
       </table>
       <InputForm socket={socket} />
     </div >

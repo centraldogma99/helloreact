@@ -3,6 +3,11 @@ body {
   color: #ffffff;
 }
 
+#chatting {
+  height: 300px;
+  overflow-y: scroll;
+}
+
 .todoItem {
   width: 130px;
   margin: 7px;
