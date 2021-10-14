@@ -10,9 +10,9 @@ export function Chat(props: chat) {
 
   return (
     <tr>
-      <td>{chat.author} : </td>
-      <td>{chat.text}</td>
-      <td>{chat.time.toString()}</td>
+      <td>{props.author} : </td>
+      <td>{props.text}</td>
+      <td>{props.time.toString()}</td>
       <td><input type="button" onClick={handleClick} /></td>
     </tr>
   );

@@ -6,11 +6,11 @@ const useInfiniteScroll = (data: any[], scrollLength: number, scrollableElement?
   const [items, setItems] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const { next, hasNext } = usePaginator(data, scrollLength);
+  const { hasNext, next } = usePaginator(data, scrollLength);
 
   const loadItems = async () => {
     if (hasNext) {
-      setItems(prev => [...prev, ...next()])
+      // setItems(prev => [...prev, ...next().data])
       setIsFetching(false);
     }
 

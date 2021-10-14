@@ -3,11 +3,12 @@ import { io } from "socket.io-client";
 import { chat } from "./types/chat"
 import { InputForm } from "./InputForm";
 import { Chat } from "./Chat";
-import useInfiniteScroll from "../hooks/useInfiniteScroll";
+import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
 
 const serverAddress = "http://localhost:9000";
 
 export function Chatting(props: { roomId: number }) {
+  console.log("chatting()")
   const scrollLength = 25;
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
@@ -20,8 +21,8 @@ export function Chatting(props: { roomId: number }) {
         time: new Date()
       }
     }));
+  const { items, hasNext, newChat, next } = useInfiniteScrollInverse(chats, scrollLength);
 
-  const { items } = useInfiniteScroll(chats, scrollLength, self.current);
   const renderChats = (chats: chat[]) => {
     return chats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
   }
@@ -35,7 +36,9 @@ export function Chatting(props: { roomId: number }) {
 
     const handleChat = (chat: chat) => {
       console.log(chat);  // TEST
-      setChats(prev => [...prev, chat])
+      // setChats(prev => [...prev, chat])
+      newChat(chat);
+      self.current.scrollTop = self.current.scrollHeight - self.current.clientHeight;
     }
 
     socket?.on('chatEvent', handleChat);
@@ -48,14 +51,17 @@ export function Chatting(props: { roomId: number }) {
   }, [])
 
   return (
-    <div ref={self} id="chatting">
-      <p>{props.roomId}번 채팅방입니다.</p>
-      <table>
-        <tbody>
-          {renderChats(items)}
-        </tbody>
-      </table>
+    <>
+      <div ref={self} id="chatting">
+        <p>{props.roomId}번 채팅방입니다.</p>
+        <table>
+          {hasNext && <input type="button" value="Load more" onClick={() => { next(); }} />}
+          <tbody>
+            {renderChats(items)}
+          </tbody>
+        </table>
+      </div >
       <InputForm socket={socket} />
-    </div >
+    </>
   )
 }
