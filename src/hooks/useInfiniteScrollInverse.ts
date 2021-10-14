@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { chat } from "../chatting/types/chat"
-// import _ from "lodash";
+import _ from "lodash";
 
 const chunkArray = (inputArray: any[], perChunk: number) => {
   return inputArray.reduce((resultArray, item, index) => {
@@ -16,7 +16,7 @@ const chunkArray = (inputArray: any[], perChunk: number) => {
   }, [])
 }
 
-const useInfiniteScrollInverse = (chats: chat[], scrollLength: number) => {
+const useInfiniteScrollInverse = (chats: chat[], scrollLength: number, scrollableElement: HTMLElement) => {
   const chunked = chunkArray(chats, scrollLength);
   const [items, setItems] = useState<chat[]>(chunked[chunked.length - 1]);
   // const [cursor, setCursor] = useState<number>(chunked.length - 1);
@@ -29,34 +29,25 @@ const useInfiniteScrollInverse = (chats: chat[], scrollLength: number) => {
     // setNextItem({ data: pagedArr[pagedArr.length - 1], isNewChat: true });
   }
 
-  const next = () => {
+  const next = async () => {
     console.log("next()")
     if (cursor.current > 0) {
       cursor.current--;
       setItems(prev => [...chunked[cursor.current], ...prev]);
     } else {
       console.log("next: noMoreItems")
+      cursor.current = 0;
       return;
     }
   }
   console.log("useInfiniteScroll()")
-  const hasNext = cursor.current > 0;
-  return { items, hasNext, newChat, next }
+  return { items, cursor, newChat, next }
 
 
   //   // return null;
   // }
 
-  // const handleScroll = async () => {
-  //   const isScrolledToBottom = scrollableElement ?
-  //     scrollableElement.scrollTop !== 0 :
-  //     document.documentElement.scrollTop !== 0;
 
-  //   if (isScrolledToBottom || isFetching) return;
-  //   else {
-  //     setIsFetching(true);
-  //   }
-  // }
 
   // useEffect(() => {
   //   if (isFetching && hasNext) {
@@ -79,9 +70,6 @@ const useInfiniteScrollInverse = (chats: chat[], scrollLength: number) => {
   //     scrollableElement?.removeEventListener('scroll', handleScroll);
   //   };
   // }, [scrollableElement])
-
-  // 새로운 채팅을 치면...
-  console.log("scroll rendered")
 }
 
 export default useInfiniteScrollInverse;

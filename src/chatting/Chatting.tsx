@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { chat } from "./types/chat"
 import { InputForm } from "./InputForm";
 import { Chat } from "./Chat";
+import _ from "lodash"
 import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
 
 const serverAddress = "http://localhost:9000";
@@ -21,11 +22,12 @@ export function Chatting(props: { roomId: number }) {
         time: new Date()
       }
     }));
-  const { items, hasNext, newChat, next } = useInfiniteScrollInverse(chats, scrollLength);
+  const { items, cursor, newChat, next } = useInfiniteScrollInverse(chats, scrollLength, self.current);
 
   const renderChats = (chats: chat[]) => {
     return chats.map((chat, index) => <Chat key={index} author={chat.author} text={chat.text} time={chat.time} />)
   }
+  const hasNext = cursor.current > 0;
 
   useEffect(() => {
     const socket = io(serverAddress, {
@@ -44,6 +46,19 @@ export function Chatting(props: { roomId: number }) {
     socket?.on('chatEvent', handleChat);
     setSocket(socket);
 
+    const handleScroll = async () => {
+      const isScrolledToTop = self.current.scrollTop === 0;
+      const topEl = document.getElementById("chats")?.children[scrollLength];
+
+      if (isScrolledToTop && hasNext) {
+        console.log(hasNext);
+        await next();
+        topEl?.scrollIntoView(true);
+      }
+    }
+    self.current.scrollTop = self.current.scrollHeight - self.current.clientHeight;
+    self.current.addEventListener('scroll', _.throttle(handleScroll, 300));
+
     return () => {
       socket?.off('chatEvent', handleChat);
       socket.disconnect();
@@ -52,11 +67,11 @@ export function Chatting(props: { roomId: number }) {
 
   return (
     <>
+      <p>{props.roomId}번 채팅방입니다.</p>
       <div ref={self} id="chatting">
-        <p>{props.roomId}번 채팅방입니다.</p>
         <table>
           {hasNext && <input type="button" value="Load more" onClick={() => { next(); }} />}
-          <tbody>
+          <tbody id="chats">
             {renderChats(items)}
           </tbody>
         </table>
