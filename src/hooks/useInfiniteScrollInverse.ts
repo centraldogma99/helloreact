@@ -18,14 +18,18 @@ const chunkArray = (inputArray: any[], perChunk: number) => {
 
 const useInfiniteScrollInverse = (chats: chat[], scrollLength: number, scrollableElement: HTMLElement) => {
   const chunked = chunkArray(chats, scrollLength);
-  const [items, setItems] = useState<chat[]>(chunked[chunked.length - 1]);
+  const [items, setItems] = useState<chat[]>(chunked.length >= 1 ? chunked[chunked.length - 1] : []);
   // const [cursor, setCursor] = useState<number>(chunked.length - 1);
   const cursor = useRef<number>(chunked.length - 1);
 
   // 새로운 채팅을 등록하고 그것을 렌더링하도록 함
-  const newChat = (newChat: chat) => {
+  const newChat = (newChat: chat | chat[]) => {
     console.log("newChat()")
-    setItems(prev => [...prev, newChat]);
+    if (Array.isArray(newChat)) {
+      setItems(prev => [...prev, ...newChat])
+    } else {
+      setItems(prev => [...prev, newChat]);
+    }
     // setNextItem({ data: pagedArr[pagedArr.length - 1], isNewChat: true });
   }
 
