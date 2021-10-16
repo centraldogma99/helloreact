@@ -10,16 +10,6 @@ import axios from "axios"
 const serverAddress = "http://localhost:9000";
 const chatServerAddr = 'http://localhost:9000/chats'
 
-const fetchData = (roomId: number, page: number) => {
-  console.log("fetchData()")
-  return axios.get(chatServerAddr, {
-    params: {
-      roomId: roomId,
-      page: page
-    }
-  })
-}
-
 export function Chatting(props: { roomId: number }) {
   console.log("chatting()")
   const scrollLength = 25;
@@ -27,44 +17,7 @@ export function Chatting(props: { roomId: number }) {
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
 
-  const [items, setItems] = useState<{ data: chat[], isNewChat: boolean }>({ data: [], isNewChat: false });
-  const [page, setPage] = useState<number>(0);
-  const [hasNext, setHasNext] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log("useEfffect of page")
-    console.log(hasNext)
-    fetchData(props.roomId, page)
-      .then((res: any) => {
-        const data = res.data;
-        setItems(prev => {
-          return {
-            data: [...data.data, ...prev.data],
-            isNewChat: false
-          }
-        })
-        setHasNext(page + 1 <= data.totalPage)
-        console.log("fetch done")
-      })
-  }, [page])
-
-  const next = () => {
-    console.log('next()')
-    if (hasNext) setPage(page + 1);
-    else console.error("noMoreItems")
-  }
-
-  const newChat = (newChat: chat) => {
-    console.log("newChat()");
-    setItems(prev => {
-      return {
-        data: [...prev.data, newChat],
-        isNewChat: true
-      }
-    });
-  }
-
-  // const { items, hasNext, newChat, next, isNewChat } = useInfiniteScrollInverse(props.roomId, scrollLength, self.current);
+  const { items, hasNext, next, newChat } = useInfiniteScrollInverse(props.roomId, scrollLength, self.current);
   const topEl = useRef<any>(null);
 
   const renderChats = (chats: chat[]) => {
@@ -73,9 +26,6 @@ export function Chatting(props: { roomId: number }) {
   }
 
   useEffect(() => {
-    console.log("useEffect of Items");
-    console.log(hasNext)
-
     if (!topEl.current) {
       // 처음 렌더링돼었을 때
       // 맨 아래로 스크롤하고, top element 설정
