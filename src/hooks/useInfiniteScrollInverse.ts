@@ -1,79 +1,39 @@
+// FIXME scrollLength 사용하도록
+
 import { useState, useRef, useEffect } from "react";
 import { chat } from "../chatting/types/chat"
 import _ from "lodash";
+import axios from "axios";
 
-const chunkArray = (inputArray: any[], perChunk: number) => {
-  return inputArray.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / perChunk)
+const chatServerAddr = 'http://localhost:9000/chats'
 
-    if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [] // start a new chunk
-    }
-
-    resultArray[chunkIndex].push(item)
-
-    return resultArray
-  }, [])
+interface chatRes {
+  data: chat[],
+  page: number,
+  totalPage: number,
+  totalChats: number
 }
 
-const useInfiniteScrollInverse = (chats: chat[], scrollLength: number, scrollableElement: HTMLElement) => {
-  const chunked = chunkArray(chats, scrollLength);
-  const [items, setItems] = useState<chat[]>(chunked.length >= 1 ? chunked[chunked.length - 1] : []);
-  // const [cursor, setCursor] = useState<number>(chunked.length - 1);
-  const cursor = useRef<number>(chunked.length - 1);
-
-  // 새로운 채팅을 등록하고 그것을 렌더링하도록 함
-  const newChat = (newChat: chat | chat[]) => {
-    console.log("newChat()")
-    if (Array.isArray(newChat)) {
-      setItems(prev => [...prev, ...newChat])
-    } else {
-      setItems(prev => [...prev, newChat]);
+const fetchData = (roomId: number, page: number) => {
+  console.log("fetchData()")
+  return axios.get(chatServerAddr, {
+    params: {
+      roomId: roomId,
+      page: page
     }
-    // setNextItem({ data: pagedArr[pagedArr.length - 1], isNewChat: true });
-  }
+  })
+}
 
-  const next = async () => {
-    console.log("next()")
-    if (cursor.current > 0) {
-      cursor.current--;
-      setItems(prev => [...chunked[cursor.current], ...prev]);
-    } else {
-      console.log("next: noMoreItems")
-      cursor.current = 0;
-      return;
+const getChatLength: (roomId: number) => Promise<{ chatLength: number }> = async (roomId: number) => {
+  return axios.get(chatServerAddr + '/length', {
+    params: {
+      roomId: roomId
     }
-  }
-  console.log("useInfiniteScroll()")
-  return { items, cursor, newChat, next }
+  })
+}
 
+const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollableElement: any) => {
 
-  //   // return null;
-  // }
-
-
-
-  // useEffect(() => {
-  //   if (isFetching && hasNext) {
-  //     loadItems();
-  //   } else {
-  //     if (!hasNext) console.log("nomoreItem")
-  //     return;
-  //   }
-  // }, [isFetching])
-
-  // useEffect(() => {
-  //   if (scrollableElement) {
-  //     scrollableElement.addEventListener('scroll', _.throttle(handleScroll, 300));
-  //   } else {
-  //     window.addEventListener('scroll', _.throttle(handleScroll, 300));
-  //   }
-
-  //   return () => {
-  //     window.removeEventListener('scroll', handleScroll);
-  //     scrollableElement?.removeEventListener('scroll', handleScroll);
-  //   };
-  // }, [scrollableElement])
 }
 
 export default useInfiniteScrollInverse;
