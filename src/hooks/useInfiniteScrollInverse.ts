@@ -36,10 +36,11 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollab
   const [items, setItems] = useState<{ data: chat[], isNewChat: boolean }>({ data: [], isNewChat: false });
   const [page, setPage] = useState<number>(0);
   const [hasNext, setHasNext] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   useEffect(() => {
     console.log("useEfffect of page")
-    console.log(hasNext)
+    setIsFetching(true);
     fetchData(roomId, page)
       .then((res: any) => {
         const data = res.data;
@@ -70,7 +71,7 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollab
     });
   }
 
-  return { items, hasNext, next, newChat }
+  return { items, hasNext, next, newChat, isFetching, setIsFetching }
 }
 
 export default useInfiniteScrollInverse;

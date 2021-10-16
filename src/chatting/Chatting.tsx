@@ -17,7 +17,7 @@ export function Chatting(props: { roomId: number }) {
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
 
-  const { items, hasNext, next, newChat } = useInfiniteScrollInverse(props.roomId, scrollLength, self.current);
+  const { items, hasNext, next, newChat, isFetching, setIsFetching } = useInfiniteScrollInverse(props.roomId, scrollLength, self.current);
   const topEl = useRef<any>(null);
 
   const renderChats = (chats: chat[]) => {
@@ -26,18 +26,30 @@ export function Chatting(props: { roomId: number }) {
   }
 
   useEffect(() => {
+    const div = self.current;
+    const handleScroll = () => {
+      const isScrolledToTop = self.current.scrollTop === 0;
+      console.log("isScrolledToTop : " + isScrolledToTop);
+      console.log("hasNext : " + hasNext);
+      // console.log("isFetching : " + isFetching);
+      if (isScrolledToTop && hasNext && !isFetching) next();
+    }
+    self.current.addEventListener('scroll', _.throttle(handleScroll, 500));
+
+    return () => {
+      div.removeEventListener('scroll', _.throttle(handleScroll, 500));
+    }
+  }, [isFetching, hasNext])
+
+
+  // self.current.addEventListener('scroll', _.throttle(handleScroll, 500));
+
+  useEffect(() => {
     if (!topEl.current) {
       // 처음 렌더링돼었을 때
       // 맨 아래로 스크롤하고, top element 설정
       self.current.scrollTop = self.current.scrollHeight - self.current.clientHeight;
       topEl.current = document.getElementById("chats")?.children[1];
-
-      // 스크롤 이벤트는 일시적으로 비활성화했음
-      const handleScroll = () => {
-        const isScrolledToTop = self.current.scrollTop === 0;
-        if (isScrolledToTop && hasNext) next();
-      }
-      // self.current.addEventListener('scroll', _.throttle(handleScroll, 300));
     } else {
       // 두번째 이후 렌더링
       if (!items.isNewChat) {
@@ -45,12 +57,14 @@ export function Chatting(props: { roomId: number }) {
         // top element로 스크롤 후 top element를 재설정
         topEl.current.scrollIntoView(true);
         topEl.current = document.getElementById("chats")?.children[1];
+        console.log("setIsFetching false")
       } else {
         // newChat을 통해 렌더링 된 경우
         // 맨 아래로 스크롤
         self.current.scrollTop = self.current.scrollHeight - self.current.clientHeight;
       }
     }
+    setIsFetching(false);
   }, [items])
 
 
@@ -85,7 +99,8 @@ export function Chatting(props: { roomId: number }) {
           <tbody id="chats">
             <tr>
               <td>
-                {hasNext && <input type="button" value="load more" onClick={() => { next() }} />}
+                {/* {hasNext && <input type="button" value="load more" onClick={() => { next() }} />} */}
+                {isFetching && 'Loading...'}
               </td>
             </tr>
             {renderChats(items.data)}
