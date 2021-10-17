@@ -9,14 +9,15 @@ import axios from "axios"
 
 const serverAddress = "http://localhost:9000";
 
-export function Chatting(props: { roomId: number }) {
+export function Chatting(props: { roomId: number, username: string }) {
   console.log("chatting()")
   const scrollLength = 25;
 
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
+  const [username, setUsername] = useState<string>("");
 
-  const { items, hasNext, next, newChat, isFetching, setIsFetching } = useInfiniteScrollInverse(props.roomId, scrollLength, self.current);
+  const { items, hasNext, next, newChat, isFetching, setIsFetching } = useInfiniteScrollInverse(props.roomId, scrollLength);
   const topEl = useRef<any>(null);
 
   const renderChats = (chats: chat[]) => {
@@ -33,16 +34,11 @@ export function Chatting(props: { roomId: number }) {
     const div = self.current;
     const throttledHandleScroll = _.throttle(handleScroll, 500)
     div.addEventListener('scroll', throttledHandleScroll);
-    // self.current.addEventListener('scroll', handleScroll)
 
     return () => {
       div.removeEventListener('scroll', throttledHandleScroll);
-      // div.removeEventListener('scroll', handleScroll)
     }
   }, [isFetching, hasNext, self])
-
-
-  // self.current.addEventListener('scroll', _.throttle(handleScroll, 500));
 
   useEffect(() => {
     if (!topEl.current) {
@@ -73,11 +69,10 @@ export function Chatting(props: { roomId: number }) {
     // 소켓 연결 및 이벤트 등록
     const socket = io(serverAddress);
     socket.on("connect", () => {
-      socket.emit("join", props.roomId)
+      socket.emit("join", props.roomId, props.username)
     })
-    socket.on('joined', (roomId, chats) => {
-      console.log("joined");
-      // items 초기값 설정
+    socket.on('joined', (roomId, username) => {
+      console.log(username + " joined");
     })
 
     // 소켓에서 chat이벤트 받을시 채팅 새로 렌더링
@@ -106,7 +101,7 @@ export function Chatting(props: { roomId: number }) {
           </tbody>
         </table>
       </div >
-      <InputForm socket={socket} />
+      <InputForm socket={socket} author={props.username} />
     </>
   )
 }

@@ -11,7 +11,7 @@ export function Chat(props: chat) {
   return (
     <tr>
       <td>{props.author} : </td>
-      <td>{props.text}</td>
+      <td className="chatText">{props.text}</td>
       <td>{props.time.toString()}</td>
       <td><input type="button" onClick={handleClick} /></td>
     </tr>

@@ -8,6 +8,10 @@ body {
   overflow-y: scroll;
 }
 
+.chatText {
+  width: 250px;
+}
+
 .todoItem {
   width: 130px;
   margin: 7px;

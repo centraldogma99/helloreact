@@ -14,12 +14,13 @@ interface chatRes {
   totalChats: number
 }
 
-const fetchData = (roomId: number, page: number) => {
+const fetchData = (roomId: number, page: number, pageSize: number) => {
   console.log("fetchData()")
   return axios.get(chatServerAddr, {
     params: {
       roomId: roomId,
-      page: page
+      page: page,
+      pageSize: pageSize
     }
   })
 }
@@ -32,7 +33,7 @@ const getChatLength: (roomId: number) => Promise<{ chatLength: number }> = async
   })
 }
 
-const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollableElement: any) => {
+const useInfiniteScrollInverse = (roomId: number, scrollLength: number) => {
   console.log("useInfiniteScrollInverse rendered")
   const [items, setItems] = useState<{ data: chat[], isNewChat: boolean }>({ data: [], isNewChat: false });
   const [page, setPage] = useState<number>(0);
@@ -42,8 +43,7 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollab
   useEffect(() => {
     console.log("useEfffect of page")
 
-
-    fetchData(roomId, page)
+    fetchData(roomId, page, scrollLength)
       .then((res: any) => {
         const data = res.data;
         // 로딩 메시지 테스트를 위해 일부러 setTimeout
