@@ -8,7 +8,6 @@ import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
 import axios from "axios"
 
 const serverAddress = "http://localhost:9000";
-const chatServerAddr = 'http://localhost:9000/chats'
 
 export function Chatting(props: { roomId: number }) {
   console.log("chatting()")
@@ -26,20 +25,21 @@ export function Chatting(props: { roomId: number }) {
   }
 
   useEffect(() => {
-    const div = self.current;
     const handleScroll = () => {
       const isScrolledToTop = self.current.scrollTop === 0;
-      console.log("isScrolledToTop : " + isScrolledToTop);
-      console.log("hasNext : " + hasNext);
-      // console.log("isFetching : " + isFetching);
+      console.log("handleScroll()");
       if (isScrolledToTop && hasNext && !isFetching) next();
     }
-    self.current.addEventListener('scroll', _.throttle(handleScroll, 500));
+    const div = self.current;
+    const throttledHandleScroll = _.throttle(handleScroll, 500)
+    div.addEventListener('scroll', throttledHandleScroll);
+    // self.current.addEventListener('scroll', handleScroll)
 
     return () => {
-      div.removeEventListener('scroll', _.throttle(handleScroll, 500));
+      div.removeEventListener('scroll', throttledHandleScroll);
+      // div.removeEventListener('scroll', handleScroll)
     }
-  }, [isFetching, hasNext])
+  }, [isFetching, hasNext, self])
 
 
   // self.current.addEventListener('scroll', _.throttle(handleScroll, 500));
@@ -55,7 +55,7 @@ export function Chatting(props: { roomId: number }) {
       if (!items.isNewChat) {
         // load more을 통해 렌더링 된 경우
         // top element로 스크롤 후 top element를 재설정
-        topEl.current.scrollIntoView(true);
+        // topEl.current.scrollIntoView(true);
         topEl.current = document.getElementById("chats")?.children[1];
         console.log("setIsFetching false")
       } else {
@@ -99,7 +99,6 @@ export function Chatting(props: { roomId: number }) {
           <tbody id="chats">
             <tr>
               <td>
-                {/* {hasNext && <input type="button" value="load more" onClick={() => { next() }} />} */}
                 {isFetching && 'Loading...'}
               </td>
             </tr>

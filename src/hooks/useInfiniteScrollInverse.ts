@@ -33,6 +33,7 @@ const getChatLength: (roomId: number) => Promise<{ chatLength: number }> = async
 }
 
 const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollableElement: any) => {
+  console.log("useInfiniteScrollInverse rendered")
   const [items, setItems] = useState<{ data: chat[], isNewChat: boolean }>({ data: [], isNewChat: false });
   const [page, setPage] = useState<number>(0);
   const [hasNext, setHasNext] = useState<boolean>(false);
@@ -40,16 +41,21 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollab
 
   useEffect(() => {
     console.log("useEfffect of page")
-    setIsFetching(true);
+
+
     fetchData(roomId, page)
       .then((res: any) => {
         const data = res.data;
-        setItems(prev => {
-          return {
-            data: [...data.data, ...prev.data],
-            isNewChat: false
-          }
-        })
+        // 로딩 메시지 테스트를 위해 일부러 setTimeout
+        setTimeout(() => {
+          setItems(prev => {
+            return {
+              data: [...data.data, ...prev.data],
+              isNewChat: false
+            }
+          })
+        }, 1000)
+
         setHasNext(page + 1 <= data.totalPage)
         console.log("fetch done")
       })
@@ -57,7 +63,11 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number, scrollab
 
   const next = () => {
     console.log('next()')
-    if (hasNext) setPage(page + 1);
+    console.log('hasNext ' + hasNext)
+    if (hasNext) {
+      setIsFetching(true);
+      setPage(page + 1);
+    }
     else console.error("noMoreItems")
   }
 
