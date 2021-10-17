@@ -15,7 +15,6 @@ export function Chatting(props: { roomId: number, username: string }) {
 
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
-  const [username, setUsername] = useState<string>("");
 
   const { items, hasNext, next, newChat, isFetching, setIsFetching } = useInfiniteScrollInverse(props.roomId, scrollLength);
   const topEl = useRef<any>(null);
@@ -73,6 +72,8 @@ export function Chatting(props: { roomId: number, username: string }) {
     })
     socket.on('joined', (roomId, username) => {
       console.log(username + " joined");
+      const newUserChat = { author: username, text: "님이 채팅방에 참여했습니다.", time: new Date() };
+      socket.emit('chatEvent', newUserChat);
     })
 
     // 소켓에서 chat이벤트 받을시 채팅 새로 렌더링

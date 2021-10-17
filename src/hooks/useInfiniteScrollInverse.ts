@@ -81,6 +81,15 @@ const useInfiniteScrollInverse = (roomId: number, scrollLength: number) => {
     });
   }
 
+  // const newUser = (newUserChat: chat) => {
+  //   setItems(prev => {
+  //     return {
+  //       data: [...prev.data, ],
+  //       isNewChat: true
+  //     }
+  //   })
+  // }
+
   return { items, hasNext, next, newChat, isFetching, setIsFetching }
 }
 
