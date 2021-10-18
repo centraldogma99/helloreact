@@ -20,6 +20,7 @@ export const EnterChat = () => {
     let message = "";
     if (isNaN(id)) message = "방 번호는 숫자만 가능합니다.";
     else if (id === "") message = "방 번호를 적어주세요."
+    else if (!Number.isInteger(Number(id)) || (id as number) <= 0) message = "방 번호는 양의 정수여야 합니다."
     else res = true;
 
     return { res: res, message: message }
@@ -40,7 +41,7 @@ export const EnterChat = () => {
   }
 
   const handleClick = () => {
-    if (!validateRoomId(roomId) || !validateUsername(username)) return;
+    if (!validateRoomId(roomId).res || !validateUsername(username).res) return;
     else {
       setChatting(<Chatting roomId={roomId} username={username} />)
       setIsRoomEntered(true);
@@ -52,11 +53,11 @@ export const EnterChat = () => {
       {!isRoomEntered &&
         <>
           <p>
-            이름
+            이름&nbsp;
             <input type="text" name="username" onChange={handleChangeUsername} value={username} />
           </p>
           <p>
-            방 번호
+            방 번호&nbsp;
             <input type="text" name="roomId" onChange={handleChangeRoomId} value={roomId} />
             <input type="button" name="roomIdBtn" value="입장" onClick={_.throttle(handleClick, 200)} />
           </p>

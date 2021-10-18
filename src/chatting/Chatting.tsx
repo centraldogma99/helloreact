@@ -5,7 +5,6 @@ import { InputForm } from "./InputForm";
 import { Chat } from "./Chat";
 import _ from "lodash"
 import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
-import axios from "axios"
 
 const serverAddress = "http://localhost:9000";
 
@@ -75,6 +74,10 @@ export function Chatting(props: { roomId: number, username: string }) {
       const newUserChat = { author: username, text: "님이 채팅방에 참여했습니다.", time: new Date() };
       socket.emit('chatEvent', newUserChat);
     })
+    // socket.on('exited', (roomId, username) => {
+    //   console.log(username + " exited");
+    //   socket.emit('chatEvent', { author: username, text: "님이 채팅방에서 나갔습니다.", time: new Date() });
+    // })
 
     // 소켓에서 chat이벤트 받을시 채팅 새로 렌더링
     const handleChat = (chat: chat) => { newChat(chat); }
@@ -82,7 +85,8 @@ export function Chatting(props: { roomId: number, username: string }) {
     setSocket(socket);
 
     return () => {
-      socket?.off('chatEvent', handleChat);
+      console.log("useEffect[] cleaned")
+      socket.off('chatEvent', handleChat);
       socket.disconnect();
     }
   }, [])
