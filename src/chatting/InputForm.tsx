@@ -10,7 +10,7 @@ export function InputForm(props: { socket: Socket, author: string }) {
   }
 
   const handleClick = () => {
-    console.log(props.author);
+    console.log("handleClick: " + props.author);
     props.socket.emit('chatEvent', { author: props.author, text: text, time: new Date() });
     setText("");
   }

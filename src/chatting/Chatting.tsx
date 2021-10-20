@@ -14,6 +14,7 @@ export function Chatting(props: { roomId: number, username: string }) {
 
   const self = useRef<any>(null);
   const [socket, setSocket] = useState<any>();
+  const [isSecretRoom, setIsSecretRoom] = useState<boolean>(false);
 
   const { items, hasNext, next, newChat, isFetching, setIsFetching } = useInfiniteScrollInverse(props.roomId, scrollLength);
   const topEl = useRef<any>(null);
@@ -74,10 +75,6 @@ export function Chatting(props: { roomId: number, username: string }) {
       const newUserChat = { author: username, text: "님이 채팅방에 참여했습니다.", time: new Date() };
       socket.emit('chatEvent', newUserChat);
     })
-    // socket.on('exited', (roomId, username) => {
-    //   console.log(username + " exited");
-    //   socket.emit('chatEvent', { author: username, text: "님이 채팅방에서 나갔습니다.", time: new Date() });
-    // })
 
     // 소켓에서 chat이벤트 받을시 채팅 새로 렌더링
     const handleChat = (chat: chat) => { newChat(chat); }
@@ -90,6 +87,10 @@ export function Chatting(props: { roomId: number, username: string }) {
       socket.disconnect();
     }
   }, [])
+
+  const handleIsSecretRoom = (e: any) => {
+    setIsSecretRoom(e.target.checked);
+  }
 
   return (
     <>
@@ -107,6 +108,8 @@ export function Chatting(props: { roomId: number, username: string }) {
         </table>
       </div >
       <InputForm socket={socket} author={props.username} />
+      <input type="checkbox" name="isSecretRoom" onChange={handleIsSecretRoom} />
+      <label htmlFor="isSecretRoom">비밀방(초대를 통해서만 입장 가능)</label>
     </>
   )
 }

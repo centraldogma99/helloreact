@@ -13,7 +13,6 @@ const useInfiniteScroll = (data: any[], scrollLength: number, scrollableElement?
       // setItems(prev => [...prev, ...next().data])
       setIsFetching(false);
     }
-
     return;
   }
 
