@@ -5,10 +5,11 @@ import { InputForm } from "./InputForm";
 import { Chat } from "./Chat";
 import _ from "lodash"
 import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
+import Cookies from "js-cookie";
 
 const serverAddress = "http://localhost:9000";
 
-export function Chatting(props: { roomId: number, username: string }) {
+export function Chatting(props: { roomId: number }) {
   console.log("chatting()")
   const scrollLength = 25;
 
@@ -68,7 +69,7 @@ export function Chatting(props: { roomId: number, username: string }) {
     // 소켓 연결 및 이벤트 등록
     const socket = io(serverAddress);
     socket.on("connect", () => {
-      socket.emit("join", props.roomId, props.username)
+      socket.emit("join", props.roomId, Cookies.get('credential'))
     })
     socket.on('joined', (roomId, username) => {
       console.log(username + " joined");
@@ -96,7 +97,7 @@ export function Chatting(props: { roomId: number, username: string }) {
     <>
       <p>{props.roomId}번 채팅방입니다.</p>
       <div ref={self} id="chatting">
-        <table>
+        <table id="chattingTable">
           <tbody id="chats">
             <tr>
               <td>
@@ -107,9 +108,9 @@ export function Chatting(props: { roomId: number, username: string }) {
           </tbody>
         </table>
       </div >
-      <InputForm socket={socket} author={props.username} />
-      <input type="checkbox" name="isSecretRoom" onChange={handleIsSecretRoom} />
-      <label htmlFor="isSecretRoom">비밀방(초대를 통해서만 입장 가능)</label>
+      <InputForm socket={socket} />
+      {/* <input type="checkbox" name="isSecretRoom" onChange={handleIsSecretRoom} /> */}
+      {/* <label htmlFor="isSecretRoom">비밀방(초대를 통해서만 입장 가능)</label> */}
     </>
   )
 }

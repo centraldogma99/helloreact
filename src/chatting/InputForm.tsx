@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Socket } from "socket.io-client";
 
-export function InputForm(props: { socket: Socket, author: string }) {
+export function InputForm(props: { socket: Socket }) {
   const [text, setText] = useState<string>("");
 
   const handleChange = (e: any, field: "text") => {
@@ -10,13 +10,18 @@ export function InputForm(props: { socket: Socket, author: string }) {
   }
 
   const handleClick = () => {
-    console.log("handleClick: " + props.author);
-    props.socket.emit('chatEvent', { author: props.author, text: text, time: new Date() });
+    props.socket.emit('chatEvent', { text: text, time: new Date() });
     setText("");
   }
 
+  const handleKeyDown = (e: any) => {
+    const code = e.code;
+    if (code === 'Enter') handleClick();
+    else return;
+  }
+
   return (
-    <div id="inputForm">
+    <div id="inputForm" onKeyDown={handleKeyDown}>
       <input type="text" name="text" onChange={(e) => { handleChange(e, "text") }} value={text} />
       <input type="button" value="Send" onClick={handleClick} />
     </div>

@@ -3,7 +3,7 @@
   로그인 성공시 채팅 로드
 */
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import {
   BrowserRouter as Router,
@@ -30,9 +30,9 @@ const LoginForm = () => {
   const [statusText, setStatusText] = useState<string>("");
 
   useEffect(() => {
-    console.log('useEffect()')
-    console.log(localStorage.getItem('user'));
-    console.log(Cookies.get('credential'))
+    console.log("useeffect()")
+    console.log(Cookies.get('credential'));
+    console.log(localStorage.getItem('user'))
     if (localStorage.getItem('user') && Cookies.get('credential')) setIsLoginSuccessful(true);
   }, [])
 
@@ -55,12 +55,14 @@ const LoginForm = () => {
         password: password
       },
         { withCredentials: true }
-      );
-      console.log(res);
+      )
+        .catch((e) => e.response);
       if (res.status === 200) {
+        localStorage.setItem('user', (res as any).data.name);
         setIsLoginSuccessful(true);
-        localStorage.setItem('user', (res as any).data.email)
         return;
+      } else {
+        setStatusText("Login failed, Error : " + res.data)
       }
     } else {
       console.log("registering")
@@ -85,19 +87,31 @@ const LoginForm = () => {
     setIsRegister(true);
   }
 
+  const handleLogoutClick = async () => {
+    await axios.get("http://localhost:9000/users/logout", { withCredentials: true });
+    setName("");
+    setEmail("");
+    setPassword("");
+    setIsLoginSuccessful(false);
+  }
+
   return (
     <>
-      {(!isLoginSuccessful) &&
+      {isLoginSuccessful && <>
+        <p>Logged In as {localStorage.getItem('user')}</p>
+        <input type="button" value="Logout" onClick={() => { handleLogoutClick() }} />
+      </>}
+      {!isLoginSuccessful &&
         <div id="loginForm">
           {isRegister && <>
             Name &nbsp;
             <input type="text" name="name" value={name} onChange={handleChange(setName)} /><br />
           </>}
           Email &nbsp;
-          <input type="text" name="email" value={email} onChange={handleChange(setEmail)} /><br />
+          <input type="email" name="email" value={email} onChange={handleChange(setEmail)} /><br />
           Password &nbsp;
-          <input type="text" name="password" value={password} onChange={handleChange(setPassword)} /><br /><br />
-          {statusText} <br />
+          <input type="password" name="password" value={password} onChange={handleChange(setPassword)} /><br /><br />
+          <p>{statusText}</p>
           <input type="button" value={isRegister ? "등록" : "로그인"} onClick={() => { handleLoginClick(isRegister) }} /><br /><br />
           {!isRegister && <input type="button" value="Register" onClick={() => { handleRegisterClick() }} />}
         </div>

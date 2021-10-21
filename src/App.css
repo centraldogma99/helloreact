@@ -6,6 +6,12 @@ body {
 #chatting {
   height: 300px;
   overflow-y: scroll;
+  
+}
+
+#chattingTable {
+  border-collapse: separate;
+  border-spacing: 10px 5px;
 }
 
 .chatText {
@@ -15,4 +21,17 @@ body {
 .todoItem {
   width: 130px;
   margin: 7px;
+}
+
+.author {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.time {
+  font-size: 8pt;
+}
+
+.chatText {
+  font-size: 10pt;
 }
