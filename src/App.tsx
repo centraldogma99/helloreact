@@ -4,6 +4,8 @@ import "./App.css";
 // import { TodoList } from "./todolist/Todolist";
 import { Chatting } from "./chatting/Chatting"
 import { EnterChat } from "./chatting/EnterChat";
+import { Router, Route, Link } from "react-router-dom";
+import LoginForm from "./login/LoginForm";
 
 
 function App() {
@@ -12,7 +14,8 @@ function App() {
   return (
     <div className="App">
       <h1>채팅채팅!!</h1>
-      <EnterChat />
+      Logged In as <b>{localStorage.getItem('user')}</b>
+      <LoginForm />
     </div>
   );
 }
