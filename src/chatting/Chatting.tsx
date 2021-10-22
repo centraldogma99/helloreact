@@ -7,7 +7,7 @@ import _ from "lodash"
 import useInfiniteScrollInverse from "../hooks/useInfiniteScrollInverse";
 import Cookies from "js-cookie";
 
-const serverAddress = "http://localhost:9000";
+const serverAddress = "http://ec2-18-116-38-81.us-east-2.compute.amazonaws.com/:9000";
 
 export function Chatting(props: { roomId: number, exitRoom: () => void }) {
   console.log("chatting()")

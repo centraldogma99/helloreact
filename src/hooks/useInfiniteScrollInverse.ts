@@ -5,7 +5,7 @@ import { chat } from "../chatting/types/chat"
 import _ from "lodash";
 import axios from "axios";
 
-const chatServerAddr = 'http://localhost:9000/chats'
+const chatServerAddr = 'http://ec2-18-116-38-81.us-east-2.compute.amazonaws.com/:9000/chats'
 
 interface chatRes {
   data: chat[],

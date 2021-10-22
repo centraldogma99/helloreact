@@ -21,6 +21,8 @@ type loginInfo = {
   password: string
 }
 
+const serverAddr = "http://ec2-18-116-38-81.us-east-2.compute.amazonaws.com/"
+
 const LoginForm = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -54,7 +56,7 @@ const LoginForm = () => {
   const handleLoginClick = async (isRegister: boolean) => {
     setStatusText("");
     if (!isRegister) {
-      const res = await axios.post("http://localhost:9000/users/login", {
+      const res = await axios.post(serverAddr + "/users/login", {
         email: email,
         password: password
       },
@@ -71,7 +73,7 @@ const LoginForm = () => {
       }
     } else {
       if (validate({ name: name, email: email, password: password })) {
-        const res = await axios.post("http://localhost:9000/users/register", {
+        const res = await axios.post(serverAddr + "/users/register", {
           name: name,
           email: email,
           password: password
@@ -96,7 +98,7 @@ const LoginForm = () => {
   }
 
   const handleLogoutClick = async () => {
-    await axios.get("http://localhost:9000/users/logout", { withCredentials: true });
+    await axios.get(serverAddr + "/users/logout", { withCredentials: true });
     setName("");
     setEmail("");
     setPassword("");
