@@ -4,9 +4,10 @@ body {
 }
 
 #chatting {
-  height: 300px;
+  height: 450px;
   overflow-y: scroll;
-  
+  margin-top : 20px;
+  margin-bottom : 15px;
 }
 
 #chattingTable {
@@ -34,4 +35,45 @@ body {
 
 .chatText {
   font-size: 10pt;
+}
+
+.App {
+  padding: 30px;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: space-between;
+  justify-content: space-between;
+}
+
+.chatInput {
+  height: 25px;
+  width: 400px;
+  
+}
+
+#chat {
+}
+
+#loginInfo {
+  /* display: inline-block; */
+  /* align-self: right; */
+  /* break-after: always; */
+  
+}
+
+#title {
+  font-size: 35px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  /* display: inline-block; */
+  /* flex-grow: 4; */
+  /* align-self: left; */
+}
+
+.lineBreak {
+  width: 100%
+}
+
+input[type="button"] {
+  height: 28px;
 }

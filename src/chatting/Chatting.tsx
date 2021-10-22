@@ -9,7 +9,7 @@ import Cookies from "js-cookie";
 
 const serverAddress = "http://localhost:9000";
 
-export function Chatting(props: { roomId: number }) {
+export function Chatting(props: { roomId: number, exitRoom: () => void }) {
   console.log("chatting()")
   const scrollLength = 25;
 
@@ -95,7 +95,7 @@ export function Chatting(props: { roomId: number }) {
 
   return (
     <>
-      <p>{props.roomId}번 채팅방입니다.</p>
+      {props.roomId}번 채팅방입니다. &nbsp; <input type="button" value="나가기" onClick={props.exitRoom} />
       <div ref={self} id="chatting">
         <table id="chattingTable">
           <tbody id="chats">

@@ -4,7 +4,6 @@ import _ from "lodash"
 
 export const EnterChat = () => {
   const [roomId, setRoomId] = useState<any>();
-  const [chatting, setChatting] = useState<any>();
   const [statusMessage, setStatusMessage] = useState<string>("");
   // const [username, setUsername] = useState<string>("");
   const [isRoomEntered, setIsRoomEntered] = useState<boolean>(false);
@@ -44,9 +43,13 @@ export const EnterChat = () => {
     // if (!validateRoomId(roomId).res || !validateUsername(username).res) return;
     if (!validateRoomId(roomId).res) return;
     else {
-      setChatting(<Chatting roomId={roomId} />)
       setIsRoomEntered(true);
     }
+  }
+
+  const exitRoom = () => {
+    setIsRoomEntered(false);
+    setRoomId(null);
   }
 
   return (
@@ -54,7 +57,7 @@ export const EnterChat = () => {
       {!isRoomEntered &&
         <>
           <p>
-            방 번호&nbsp;
+            방 번호&nbsp;&nbsp;
             <input type="text" name="roomId" onChange={handleChangeRoomId} value={roomId} />
             <input type="button" name="roomIdBtn" value="입장" onClick={_.throttle(handleClick, 200)} />
           </p>
@@ -62,7 +65,7 @@ export const EnterChat = () => {
       }
 
       <p>{statusMessage}</p>
-      {chatting}
+      {isRoomEntered && <Chatting roomId={roomId} exitRoom={exitRoom} />}
     </div>
   )
 }

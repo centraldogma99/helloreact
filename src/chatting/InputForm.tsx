@@ -22,7 +22,7 @@ export function InputForm(props: { socket: Socket }) {
 
   return (
     <div id="inputForm" onKeyDown={handleKeyDown}>
-      <input type="text" name="text" onChange={(e) => { handleChange(e, "text") }} value={text} />
+      <input type="text" name="text" className="chatInput" onChange={(e) => { handleChange(e, "text") }} value={text} />
       <input type="button" value="Send" onClick={handleClick} />
     </div>
   )

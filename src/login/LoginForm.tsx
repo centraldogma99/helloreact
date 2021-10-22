@@ -36,19 +36,23 @@ const LoginForm = () => {
     if (localStorage.getItem('user') && Cookies.get('credential')) setIsLoginSuccessful(true);
   }, [])
 
+  // 입력 검증, 간편함을 위해 어떠한 이유로 검증이 실패했는지까지는 구현 x
   const validate = (loginInfo: loginInfo) => {
     return !(!loginInfo.email.includes('@') || !loginInfo.email.includes('.') ||
       loginInfo.name === "" ||
       loginInfo.password.length < 8)
   }
 
+  // 텍스트박스 내용 바뀔때 state바꾸기
   const handleChange = (setState: any) => {
     return (e: any) => {
       setState(e.target.value);
     }
   }
 
+  // 로그인 버튼 또는 등록 버튼이 눌렸을 때의 동작
   const handleLoginClick = async (isRegister: boolean) => {
+    setStatusText("");
     if (!isRegister) {
       const res = await axios.post("http://localhost:9000/users/login", {
         email: email,
@@ -62,24 +66,28 @@ const LoginForm = () => {
         setIsLoginSuccessful(true);
         return;
       } else {
-        setStatusText("Login failed, Error : " + res.data)
+        setStatusText("Login failed, Error : " + res.data);
+        setEmail(""); setPassword("");
       }
     } else {
-      console.log("registering")
       if (validate({ name: name, email: email, password: password })) {
         const res = await axios.post("http://localhost:9000/users/register", {
           name: name,
           email: email,
           password: password
-        });
-        console.log(res);
-        setIsRegister(false);
+        }).catch((e) => e.response);
+        if (res.status === 200) {
+          setStatusText("Register successful");
+        } else {
+          setStatusText("Register failed, Error : " + res.data)
+        }
       } else {
         setStatusText("입력값이 잘못되었습니다.");
-        setPassword("");
-        setName("");
-        setEmail("");
       }
+      setPassword("");
+      setName("");
+      setEmail("");
+      setIsRegister(false);
     }
   }
 
@@ -97,10 +105,13 @@ const LoginForm = () => {
 
   return (
     <>
-      {isLoginSuccessful && <>
-        <p>Logged In as {localStorage.getItem('user')}</p>
-        <input type="button" value="Logout" onClick={() => { handleLogoutClick() }} />
-      </>}
+      {isLoginSuccessful &&
+        <div id="loginInfo">
+          <small>Logged In as </small> <b>{localStorage.getItem('user')}</b> &nbsp;
+          <input type="button" value="Logout" onClick={() => { handleLogoutClick() }} />
+        </div>
+      }
+      <div className="lineBreak" />
       {!isLoginSuccessful &&
         <div id="loginForm">
           {isRegister && <>
